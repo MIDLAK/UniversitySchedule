@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "teacher.h"
+#include "../headers/teacher.h"
 
 int main(int argc, char **argv)
 {
