@@ -1,5 +1,5 @@
-#ifndef __CLASSROOM
-#define __CLASSROOM
+#ifndef __ROOM
+#define __ROOM
 
 enum rtype 
 {
