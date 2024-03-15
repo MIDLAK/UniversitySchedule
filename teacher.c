@@ -1,6 +1,7 @@
-#include "teacher.h"
 #include <stdlib.h>
 #include <string.h>
+
+#include "teacher.h"
 
 struct teacher* new_teacher(int id, char* name, char* surname, char *midname)
 {
