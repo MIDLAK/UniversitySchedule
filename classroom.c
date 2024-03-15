@@ -1,7 +1,8 @@
 #ifndef __CLASSROOM
 #define __CLASSROOM
 
-enum rtype {
+enum rtype 
+{
     BIG_LECTURE,    /* более 3-х групп */
     MEDIUM_LECTURE, /* 3 группы */
     SMALL_LECTURE,  /* мньше 3-х групп */
@@ -9,7 +10,8 @@ enum rtype {
     LABORATORY
 };
 
-struct room {
+struct room 
+{
     int room_number;
     int building_number; /* номер корпуса */
     int capacity;
