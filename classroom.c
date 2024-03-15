@@ -16,6 +16,7 @@ struct room
     int building_number; /* номер корпуса */
     int capacity;
     enum rtype type;
+    int department;      /* к какой кафедре относится аудитория */
 };
 
 #endif /* __CLASSROOM */
