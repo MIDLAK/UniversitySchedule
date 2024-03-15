@@ -12,8 +12,8 @@ enum rtype
 
 struct room 
 {
-    int room_number;
-    int building_number; /* номер корпуса */
+    int room_num;
+    int building_num; /* номер корпуса */
     int capacity;
     enum rtype type;
     int department;      /* к какой кафедре относится аудитория */
