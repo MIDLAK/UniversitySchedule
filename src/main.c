@@ -8,9 +8,12 @@
 
 int main(int argc, char **argv)
 {
+    /* генерация данных */
     struct department deps[] = {{1}, {2}, {3}};
     struct academ_claster clasters[] = {{30, GROUP}, {15, SUBGROUP}, {90, THREAD}};
-    struct discipline disciplines[] = {{1}, {2}, {3}};
+    struct discipline disciplines[] = {new_discipline(1, "Программирование"), 
+                                       new_discipline(2, "Базы данных"), 
+                                       new_discipline(3, "Линейная алгебра")};
 
     struct teacher ananyev = new_teacher(100, "Павел", "Ананьев", "Иванович");
     struct teacher troickiy = new_teacher(101, "Виктор", "Троицкий", "Сергеевич");
