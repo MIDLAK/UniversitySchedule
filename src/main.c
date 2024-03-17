@@ -15,10 +15,16 @@ int main(int argc, char **argv)
                                        new_discipline(2, "Базы данных"), 
                                        new_discipline(3, "Линейная алгебра")};
 
+    /* преподаватели */
     struct teacher ananyev = new_teacher(100, "Павел", "Ананьев", "Иванович");
     struct teacher troickiy = new_teacher(101, "Виктор", "Троицкий", "Сергеевич");
-    struct teacher andreeva = new_teacher(102, "Ангелика", "Андреева", "Юрьевна");
-    struct teacher teachers[] = {ananyev, troickiy, andreeva};
+    struct teacher irina = new_teacher(102, "Ирина", "Головичёва", "Эмильевна");
+    struct teacher teachers[] = {ananyev, troickiy, irina};
+    
+    /* циклы занятий */
+    struct lessons_cycle cycles[] = {{&ananyev, &disciplines[1], &clasters[1], 15, 1},
+                                     {&troickiy, &disciplines[0], &clasters[2], 7, 2},
+                                     {&irina, &disciplines[2], &clasters[1], 14, 1}};
 
     /* генерирование аудиторий */
 #define ROOM_QTY 410

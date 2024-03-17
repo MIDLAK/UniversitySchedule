@@ -16,6 +16,7 @@ enum rtype
 
 struct room 
 {
+    /* TODO: включить номер корпуса в номер комнаты? */
     int room_num;
     int building_num;                /* номер корпуса */
     int capacity;
