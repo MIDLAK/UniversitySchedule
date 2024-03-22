@@ -30,6 +30,13 @@ struct schedule_chromosome
     struct gene *gens;
 };
 
+/* генерирование расписаний */
+struct schedule_chromosome schedule_generate(struct lessons_cycle *cycles, int cycles_num,
+        struct room *rooms, int rooms_num, 
+        struct time_interval *time_intervals, int pair_times_len);
+
+int schedule_test(struct schedule_chromosome *schedule);
+
 /* проверка наложения аудиторий
  * 0 - наложений нет
  * 1 - наложения есть */

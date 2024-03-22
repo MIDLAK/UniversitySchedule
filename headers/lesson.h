@@ -22,7 +22,7 @@ struct lessons_cycle
     struct academ_claster *claster;     /* подгруппа, группа или поток */
 
     int length;    /* число занятий в цикле */
-    int intensity; /* 1 - одно занятие в неделю, 2 - одно занятие раз в две недели */  
+    int intensity; /* 1 - одно занятие в неделю, 2 - два занятия в неделю, ... */  
 };
 
 #endif /* __LESSON */

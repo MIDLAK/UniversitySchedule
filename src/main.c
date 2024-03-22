@@ -22,14 +22,32 @@ int main(int argc, char **argv)
     struct teacher teachers[] = {ananyev, troickiy, irina};
     
     /* циклы занятий */
-    struct lessons_cycle cycles[] = {{&ananyev, &disciplines[1], &clasters[1], 15, 1},
+    struct lessons_cycle cycles[] = {{&ananyev, &disciplines[1], &clasters[1], 15, 2},
                                      {&troickiy, &disciplines[0], &clasters[2], 7, 2},
                                      {&irina, &disciplines[2], &clasters[1], 14, 1}};
+    int cycles_num = sizeof(cycles)/sizeof(cycles[0]);
 
     /* генерирование аудиторий */
 #define ROOM_QTY 410
     struct room* rooms = rooms_generate(ROOM_QTY, 5, 100, 10, 300, deps, 
             sizeof(deps) / sizeof(deps[0]));
+
+    /* генерация интервалов времени */
+    struct time_interval intervals[] = {{1, 1, 1}, {1, 1, 2}, {1, 1, 3}, {1, 1, 4}, 
+                                        {1, 2, 1}, {1, 2, 2}, {1, 2, 3}, {1, 2, 4},
+                                        {2, 1, 1}, {2, 1, 2}, {2, 1, 3}, {2, 1, 4}};
+
+    struct schedule_chromosome schedule = schedule_generate(cycles, cycles_num, rooms,
+            ROOM_QTY, intervals, sizeof(intervals)/sizeof(intervals[0]));
+
+    for (int i = 0; i < cycles_num; i++)
+        printf("\n[i] disc = %s, room = %d, time = [%d.%d.%d, %d.%d.%d, ...", 
+                schedule.gens[i].lescycle->discipline->name, 
+                schedule.gens[i].room->room_num, 
+                schedule.gens[i].pair_times[0].week, schedule.gens[i].pair_times[0].day, 
+                schedule.gens[i].pair_times[0].pair, 
+                schedule.gens[i].pair_times[1].week, schedule.gens[i].pair_times[1].day, 
+                schedule.gens[i].pair_times[1].pair);
 
     return 0;
 }

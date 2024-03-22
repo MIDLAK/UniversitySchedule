@@ -1,4 +1,43 @@
 #include "../headers/schedule.h"
+#include <stdlib.h>
+
+struct schedule_chromosome schedule_generate(struct lessons_cycle *cycles, int cycles_num,
+        struct room *rooms, int rooms_num,
+        struct time_interval *time_intervals, int pair_times_len)
+{
+    struct schedule_chromosome schedule;
+    schedule.cycles_num = cycles_num;
+    schedule.gens = (struct gene*)malloc(sizeof(struct gene) * cycles_num);
+
+    /* подбор кабинета и пар для циклов */
+    for (int i = 0; i < cycles_num; i++) {
+        schedule.gens[i].lescycle = &cycles[i];
+
+        /* TODO: пытаться размещать занятия в одном корпусе */
+        schedule.gens[i].room = &rooms[rand() % rooms_num];
+
+        /* TODO: сделать равномерную нагрузку по неделям */
+        int intensity = schedule.gens[i].lescycle->intensity;
+#define WEEKS_CYCLE 2 /* вычисление, сколько пар нужно выбрать исходя из интенсовности */
+        schedule.gens[i].pair_times = malloc(sizeof(struct time_interval) * intensity * WEEKS_CYCLE);
+        for (int j = 0; j < (intensity * WEEKS_CYCLE); j++) {
+            schedule.gens[i].pair_times[j] = time_intervals[rand() % pair_times_len];
+        }
+    }
+
+    /* schedule_test(&schedule); */
+
+    return schedule;
+}
+
+int schedule_test(struct schedule_chromosome *schedule)
+{
+    int rconflict = rooms_conflict(schedule);
+    if (rconflict == 0)
+        return 0;
+    else
+        return 1;
+}
 
 int rooms_conflict(struct schedule_chromosome *schedule)
 {
