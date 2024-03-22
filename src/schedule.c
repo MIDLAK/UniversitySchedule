@@ -1,5 +1,4 @@
 #include "../headers/schedule.h"
-#include <stdio.h>
 #include <stdlib.h>
 
 struct schedule_chromosome schedule_generate(struct lessons_cycle *cycles, int cycles_num,
@@ -10,24 +9,27 @@ struct schedule_chromosome schedule_generate(struct lessons_cycle *cycles, int c
     schedule.cycles_num = cycles_num;
     schedule.gens = (struct gene*)malloc(sizeof(struct gene) * cycles_num);
 
-    /* подбор кабинета и пар для циклов */
-    for (int i = 0; i < cycles_num; i++) {
-        schedule.gens[i].lescycle = &cycles[i];
+#define MAX_ATTEMPT_COUNT 100
+    int attempt_count = -1;
+    do {
+        attempt_count++;
+        /* подбор кабинета и пар для циклов */
+        for (int i = 0; i < cycles_num; i++) {
+            schedule.gens[i].lescycle = &cycles[i];
 
-        /* TODO: пытаться размещать занятия в одном корпусе */
-        schedule.gens[i].room = &rooms[rand() % rooms_num];
+            /* TODO: пытаться размещать занятия в одном корпусе */
+            schedule.gens[i].room = &rooms[rand() % rooms_num];
 
-        /* TODO: сделать равномерную нагрузку по неделям */
-        int intensity = schedule.gens[i].lescycle->intensity;
+            /* TODO: сделать равномерную нагрузку по неделям */
+            int intensity = schedule.gens[i].lescycle->intensity;
 #define WEEKS_CYCLE 2 /* вычисление, сколько пар нужно выбрать исходя из интенсовности */
-        schedule.gens[i].pair_times = malloc(sizeof(struct time_interval) * intensity * WEEKS_CYCLE);
-        schedule.gens[i].pair_times_len = intensity * WEEKS_CYCLE;
-        for (int j = 0; j < (intensity * WEEKS_CYCLE); j++) {
-            schedule.gens[i].pair_times[j] = time_intervals[rand() % pair_times_len];
+            schedule.gens[i].pair_times = malloc(sizeof(struct time_interval) * intensity * WEEKS_CYCLE);
+            schedule.gens[i].pair_times_len = intensity * WEEKS_CYCLE;
+            for (int j = 0; j < (intensity * WEEKS_CYCLE); j++) {
+                schedule.gens[i].pair_times[j] = time_intervals[rand() % pair_times_len];
+            }
         }
-    }
-
-    /* schedule_test(&schedule); */
+    } while(schedule_test(&schedule) && attempt_count < 100);
 
     return schedule;
 }
@@ -57,7 +59,7 @@ int rooms_conflict(struct schedule_chromosome *schedule)
                 /* проверка времени, если аудитории совпали */
                 if (main_rnum == rnum && main_rbuild == rbuild) {
                     for(int t = 0; t < schedule->gens[i].pair_times_len; t++) {
-                        for (int m; m < schedule->gens[j].pair_times_len; m++) {
+                        for (int m = 0; m < schedule->gens[j].pair_times_len; m++) {
                             int main_day = schedule->gens[i].pair_times[t].day, 
                                 main_week = schedule->gens[i].pair_times[t].week,
                                 main_pair = schedule->gens[i].pair_times[t].pair;
