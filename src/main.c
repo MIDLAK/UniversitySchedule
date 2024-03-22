@@ -13,7 +13,8 @@ int main(int argc, char **argv)
     struct academ_claster clasters[] = {{30, GROUP}, {15, SUBGROUP}, {90, THREAD}};
     struct discipline disciplines[] = {new_discipline(1, "Программирование"), 
                                        new_discipline(2, "Базы данных"), 
-                                       new_discipline(3, "Линейная алгебра")};
+                                       new_discipline(3, "Линейная алгебра"),
+                                       new_discipline(4, "ППО")};
 
     /* преподаватели */
     struct teacher ananyev = new_teacher(100, "Павел", "Ананьев", "Иванович");
@@ -24,7 +25,8 @@ int main(int argc, char **argv)
     /* циклы занятий */
     struct lessons_cycle cycles[] = {{&ananyev, &disciplines[1], &clasters[1], 15, 2},
                                      {&troickiy, &disciplines[0], &clasters[2], 7, 2},
-                                     {&irina, &disciplines[2], &clasters[1], 14, 1}};
+                                     {&irina, &disciplines[2], &clasters[1], 14, 1},
+                                     {&ananyev, &disciplines[3], &clasters[1], 10, 2}};
     int cycles_num = sizeof(cycles)/sizeof(cycles[0]);
 
     /* генерирование аудиторий */
@@ -39,17 +41,19 @@ int main(int argc, char **argv)
     struct schedule_chromosome schedule = schedule_generate(cycles, cycles_num, rooms,
             ROOM_QTY, intervals, sizeof(intervals)/sizeof(intervals[0]));
 
-    for (int i = 0; i < cycles_num; i++)
-        printf("\n[i] disc = %s, room = %d, time = [%d.%d.%d, %d.%d.%d, ...", 
-                schedule.gens[i].lescycle->discipline->name, 
-                schedule.gens[i].room->room_num, 
-                schedule.gens[i].pair_times[0].week, schedule.gens[i].pair_times[0].day, 
-                schedule.gens[i].pair_times[0].pair, 
-                schedule.gens[i].pair_times[1].week, schedule.gens[i].pair_times[1].day, 
-                schedule.gens[i].pair_times[1].pair);
+    for (int i = 0; i < cycles_num; i++) {
+        struct gene *g = &schedule.gens[i];
+        printf("\n[%d] disc = %s, room = %d, time = [%d.%d.%d, %d.%d.%d, ...], teacher = %s", 
+                i, g->lescycle->discipline->name, g->room->room_num, g->pair_times[0].week,
+                g->pair_times[0].day, g->pair_times[0].pair, g->pair_times[1].week, 
+                g->pair_times[1].day, g->pair_times[1].pair, g->lescycle->teacher->surname);
+    }
 
     int test_schedule = schedule_test(&schedule);
     printf("\ntest = %d", test_schedule);
+
+    int teacher_test = teachers_conflict(&schedule);
+    printf("\nteacher test = %d", teacher_test);
 
     return 0;
 }

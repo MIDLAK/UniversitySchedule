@@ -1,14 +1,3 @@
-/* z_i - цикл занятий
- * a_i - аудитория
- * t_i - время проведения пар
- * 
- *  z_1   z_2  ...  z_n          z_1   z_2  ...  z_n
- *  ---   ---       ---          ---   ---       ---
- * |a_1| |a_2| ... |a_n|        |t_1| |t_2| ... |t_n|       
- *  ---   ---       ---          ---   ---       ---
- *    первая хромосома            вторая хромосома
- */
-
 #ifndef __SCHEDULE
 #define __SCHEDULE
 
@@ -41,5 +30,8 @@ int schedule_test(struct schedule_chromosome *schedule);
  * 0 - наложений нет
  * 1 - наложения есть */
 int rooms_conflict(struct schedule_chromosome *schedule);
+
+/* 0 - наложение нет, 1 - наложения есть */
+int teachers_conflict(struct schedule_chromosome *schedule);
 
 #endif /* __SCHEDULE */

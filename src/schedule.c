@@ -29,7 +29,7 @@ struct schedule_chromosome schedule_generate(struct lessons_cycle *cycles, int c
                 schedule.gens[i].pair_times[j] = time_intervals[rand() % pair_times_len];
             }
         }
-    } while(schedule_test(&schedule) && attempt_count < 100);
+    } while(schedule_test(&schedule) && attempt_count < MAX_ATTEMPT_COUNT);
 
     return schedule;
 }
@@ -37,7 +37,7 @@ struct schedule_chromosome schedule_generate(struct lessons_cycle *cycles, int c
 int schedule_test(struct schedule_chromosome *schedule)
 {
     int rconflict = rooms_conflict(schedule);
-    if (rconflict == 0)
+    if (rconflict == 0 && teachers_conflict(schedule) == 0)
         return 0;
     else
         return 1;
@@ -79,4 +79,39 @@ int rooms_conflict(struct schedule_chromosome *schedule)
     
     return 0;
 }
+
+/* 0 - наложение нет, 1 - наложения есть */
+int teachers_conflict(struct schedule_chromosome *schedule)
+{
+    for (int i = 0; i < schedule->cycles_num; i++) {
+        int main_teacher_id = schedule->gens[i].lescycle->teacher->id;
+
+        /* другие циклы занятий */
+        for (int j = 0; j < schedule->cycles_num; j++) {
+            if (i != j) {
+                int teacher_id = schedule->gens[j].lescycle->teacher->id; 
+
+                if (main_teacher_id == teacher_id) {
+                    for(int t = 0; t < schedule->gens[i].pair_times_len; t++) {
+                        for (int m = 0; m < schedule->gens[j].pair_times_len; m++) {
+                            int main_day = schedule->gens[i].pair_times[t].day, 
+                                main_week = schedule->gens[i].pair_times[t].week,
+                                main_pair = schedule->gens[i].pair_times[t].pair;
+
+                            int day = schedule->gens[j].pair_times[m].day,
+                                week = schedule->gens[j].pair_times[m].week,
+                                pair = schedule->gens[j].pair_times[m].pair;
+
+                            if (main_day == day && main_week == week && main_pair == pair)
+                                return 1; /* считать все конфликты нет смысла */
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return 0;
+}
+
 
