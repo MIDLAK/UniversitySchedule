@@ -36,7 +36,6 @@ int main(int argc, char **argv)
     struct time_interval intervals[] = {{1, 1, 1}, {1, 1, 2}, {1, 1, 3}, {1, 1, 4}, 
                                         {1, 2, 1}, {1, 2, 2}, {1, 2, 3}, {1, 2, 4},
                                         {2, 1, 1}, {2, 1, 2}, {2, 1, 3}, {2, 1, 4}};
-
     struct schedule_chromosome schedule = schedule_generate(cycles, cycles_num, rooms,
             ROOM_QTY, intervals, sizeof(intervals)/sizeof(intervals[0]));
 
@@ -48,6 +47,9 @@ int main(int argc, char **argv)
                 schedule.gens[i].pair_times[0].pair, 
                 schedule.gens[i].pair_times[1].week, schedule.gens[i].pair_times[1].day, 
                 schedule.gens[i].pair_times[1].pair);
+
+    int test_schedule = schedule_test(&schedule);
+    printf("\ntest = %d", test_schedule);
 
     return 0;
 }

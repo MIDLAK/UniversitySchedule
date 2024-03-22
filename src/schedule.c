@@ -1,4 +1,5 @@
 #include "../headers/schedule.h"
+#include <stdio.h>
 #include <stdlib.h>
 
 struct schedule_chromosome schedule_generate(struct lessons_cycle *cycles, int cycles_num,
@@ -20,6 +21,7 @@ struct schedule_chromosome schedule_generate(struct lessons_cycle *cycles, int c
         int intensity = schedule.gens[i].lescycle->intensity;
 #define WEEKS_CYCLE 2 /* вычисление, сколько пар нужно выбрать исходя из интенсовности */
         schedule.gens[i].pair_times = malloc(sizeof(struct time_interval) * intensity * WEEKS_CYCLE);
+        schedule.gens[i].pair_times_len = intensity * WEEKS_CYCLE;
         for (int j = 0; j < (intensity * WEEKS_CYCLE); j++) {
             schedule.gens[i].pair_times[j] = time_intervals[rand() % pair_times_len];
         }
