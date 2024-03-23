@@ -23,10 +23,10 @@ int main(int argc, char **argv)
     struct teacher teachers[] = {ananyev, troickiy, irina};
     
     /* циклы занятий */
-    struct lessons_cycle cycles[] = {{&ananyev, &disciplines[1], &clasters[1], 15, 2},
-                                     {&troickiy, &disciplines[0], &clasters[2], 7, 2},
-                                     {&irina, &disciplines[2], &clasters[1], 14, 1},
-                                     {&ananyev, &disciplines[3], &clasters[1], 10, 2}};
+    struct lessons_cycle cycles[] = {{&ananyev, &disciplines[1], &clasters[1], PRACTICE, 15, 2},
+                                     {&troickiy, &disciplines[0], &clasters[2], LECTURE, 7, 2},
+                                     {&irina, &disciplines[2], &clasters[1], LAB, 14, 1},
+                                     {&ananyev, &disciplines[3], &clasters[1], LAB, 10, 2}};
     int cycles_num = sizeof(cycles)/sizeof(cycles[0]);
 
     /* генерирование аудиторий */

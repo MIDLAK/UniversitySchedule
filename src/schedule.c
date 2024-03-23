@@ -1,4 +1,5 @@
 #include "../headers/schedule.h"
+#include <stdio.h>
 #include <stdlib.h>
 
 struct schedule_chromosome schedule_generate(struct lessons_cycle *cycles, int cycles_num,
@@ -17,7 +18,7 @@ struct schedule_chromosome schedule_generate(struct lessons_cycle *cycles, int c
         for (int i = 0; i < cycles_num; i++) {
             schedule.gens[i].lescycle = &cycles[i];
 
-            /* TODO: пытаться размещать занятия в одном корпусе */
+            /* TODO: пытаться размещать занятия в одном корпусе и выбирать нужные типы */
             schedule.gens[i].room = &rooms[rand() % rooms_num];
 
             /* TODO: сделать равномерную нагрузку по неделям */
@@ -31,13 +32,15 @@ struct schedule_chromosome schedule_generate(struct lessons_cycle *cycles, int c
         }
     } while(schedule_test(&schedule) && attempt_count < MAX_ATTEMPT_COUNT);
 
+    printf("[debug]: attepmt_count = %d", attempt_count);
     return schedule;
 }
 
 int schedule_test(struct schedule_chromosome *schedule)
 {
     int rconflict = rooms_conflict(schedule);
-    if (rconflict == 0 && teachers_conflict(schedule) == 0)
+    if (rconflict == 0 && teachers_conflict(schedule) == 0 && 
+            correct_room_type_and_capacity(schedule) == 0)
         return 0;
     else
         return 1;
@@ -115,3 +118,27 @@ int teachers_conflict(struct schedule_chromosome *schedule)
 }
 
 
+/* 0 - аудитории соответсвуют типам, 1 - есть несоотвествия */
+int correct_room_type_and_capacity(struct schedule_chromosome *schedule)
+{
+    for (int i = 0; i < schedule->cycles_num; i++) {
+        struct gene *g = &schedule->gens[i];
+        int room_capacity = g->room->capacity;
+        int students_num = g->lescycle->claster->students_num;
+
+        if (room_capacity >= students_num) {
+            enum ltype lescycle_type = g->lescycle->type;
+            enum rtype room_type = g->room->type;
+
+            if ((lescycle_type == LAB && room_type != LABORATORY) ||
+                (lescycle_type == PRACTICE && room_type != PRACTICAL) ||
+                (lescycle_type == LECTURE && (room_type != BIG_LECTURE || 
+                    room_type != MEDIUM_LECTURE || room_type != SMALL_LECTURE))
+               )
+                return 1;
+
+        } else { return 2; }
+    }
+
+    return 0;
+}

@@ -34,4 +34,7 @@ int rooms_conflict(struct schedule_chromosome *schedule);
 /* 0 - наложение нет, 1 - наложения есть */
 int teachers_conflict(struct schedule_chromosome *schedule);
 
+/* 0 - аудитории соответсвуют типам, 1 - есть несоотвествия, 2 - недостаточно места */
+int correct_room_type_and_capacity(struct schedule_chromosome *schedule);
+
 #endif /* __SCHEDULE */

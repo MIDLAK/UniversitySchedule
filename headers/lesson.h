@@ -21,6 +21,8 @@ struct lessons_cycle
     struct discipline     *discipline;
     struct academ_claster *claster;     /* подгруппа, группа или поток */
 
+    enum ltype type;
+
     int length;    /* число занятий в цикле */
     int intensity; /* 1 - одно занятие в неделю, 2 - два занятия в неделю, ... */  
 };
