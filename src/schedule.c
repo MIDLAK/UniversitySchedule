@@ -3,8 +3,7 @@
 #include <stdlib.h>
 
 struct schedule_chromosome schedule_generate(struct lessons_cycle *cycles, int cycles_num,
-        struct room *rooms, int rooms_num,
-        struct time_interval *time_intervals, int pair_times_len)
+        struct room *rooms, int rnum, struct time_interval *time_intervals, int pair_times_len)
 {
     struct schedule_chromosome schedule;
     schedule.cycles_num = cycles_num;
@@ -12,14 +11,31 @@ struct schedule_chromosome schedule_generate(struct lessons_cycle *cycles, int c
 
 #define MAX_ATTEMPT_COUNT 100
     int attempt_count = -1;
+    int j_end = 0;
     do {
         attempt_count++;
         /* подбор кабинета и пар для циклов */
         for (int i = 0; i < cycles_num; i++) {
             schedule.gens[i].lescycle = &cycles[i];
 
-            /* TODO: пытаться размещать занятия в одном корпусе и выбирать нужные типы */
-            schedule.gens[i].room = &rooms[rand() % rooms_num];
+            /* TODO: пытаться выбирать аудитории разрозненно 
+             * (чтобы на одну не назначалось много пар) */
+            enum ltype lcycle_type = schedule.gens[i].lescycle->type;
+            for (int j = 0; j < rnum; j++) {
+                if (lcycle_type == LECTURE && (rooms[j].type == BIG_LECTURE || 
+                         rooms[j].type == MEDIUM_LECTURE || rooms[j].type == SMALL_LECTURE)) {
+                    schedule.gens[i].room = &rooms[j];
+                    break;
+                }
+                else if (lcycle_type == PRACTICE && rooms[j].type == PRACTICAL) {
+                    schedule.gens[i].room = &rooms[j];
+                    break;
+                }
+                else if (lcycle_type == LAB && rooms[j].type == LABORATORY) {
+                    schedule.gens[i].room = &rooms[j];
+                    break;
+                }
+            }
 
             /* TODO: сделать равномерную нагрузку по неделям */
             int intensity = schedule.gens[i].lescycle->intensity;
@@ -39,8 +55,9 @@ struct schedule_chromosome schedule_generate(struct lessons_cycle *cycles, int c
 int schedule_test(struct schedule_chromosome *schedule)
 {
     int rconflict = rooms_conflict(schedule);
-    if (rconflict == 0 && teachers_conflict(schedule) == 0 && 
-            correct_room_type_and_capacity(schedule) == 0)
+    int tconflict = teachers_conflict(schedule);
+    int rtype_conflict = correct_room_type_and_capacity(schedule);
+    if (rconflict == 0 && tconflict == 0)
         return 0;
     else
         return 1;
@@ -91,23 +108,26 @@ int teachers_conflict(struct schedule_chromosome *schedule)
 
         /* другие циклы занятий */
         for (int j = 0; j < schedule->cycles_num; j++) {
-            if (i != j) {
-                int teacher_id = schedule->gens[j].lescycle->teacher->id; 
+            int teacher_id = schedule->gens[j].lescycle->teacher->id; 
 
-                if (main_teacher_id == teacher_id) {
-                    for(int t = 0; t < schedule->gens[i].pair_times_len; t++) {
-                        for (int m = 0; m < schedule->gens[j].pair_times_len; m++) {
-                            int main_day = schedule->gens[i].pair_times[t].day, 
-                                main_week = schedule->gens[i].pair_times[t].week,
-                                main_pair = schedule->gens[i].pair_times[t].pair;
+            if (main_teacher_id == teacher_id) {
+                for(int t = 0; t < schedule->gens[i].pair_times_len; t++) {
+                    for (int m = 0; m < schedule->gens[j].pair_times_len; m++) {
 
-                            int day = schedule->gens[j].pair_times[m].day,
-                                week = schedule->gens[j].pair_times[m].week,
-                                pair = schedule->gens[j].pair_times[m].pair;
+                        /* наложение пар одного и того же преподавателя */
+                        if (i == j && t == m)
+                            continue;
 
-                            if (main_day == day && main_week == week && main_pair == pair)
-                                return 1; /* считать все конфликты нет смысла */
-                        }
+                        int main_day = schedule->gens[i].pair_times[t].day, 
+                            main_week = schedule->gens[i].pair_times[t].week,
+                            main_pair = schedule->gens[i].pair_times[t].pair;
+
+                        int day = schedule->gens[j].pair_times[m].day,
+                            week = schedule->gens[j].pair_times[m].week,
+                            pair = schedule->gens[j].pair_times[m].pair;
+
+                        if (main_day == day && main_week == week && main_pair == pair)
+                            return 1; /* считать все конфликты нет смысла */
                     }
                 }
             }
@@ -123,21 +143,23 @@ int correct_room_type_and_capacity(struct schedule_chromosome *schedule)
 {
     for (int i = 0; i < schedule->cycles_num; i++) {
         struct gene *g = &schedule->gens[i];
-        int room_capacity = g->room->capacity;
-        int students_num = g->lescycle->claster->students_num;
+        if (g->room != NULL) {
+            int room_capacity = g->room->capacity;
+            int students_num = g->lescycle->claster->students_num;
 
-        if (room_capacity >= students_num) {
-            enum ltype lescycle_type = g->lescycle->type;
-            enum rtype room_type = g->room->type;
+            if (room_capacity >= students_num) {
+                enum ltype lescycle_type = g->lescycle->type;
+                enum rtype room_type = g->room->type;
 
-            if ((lescycle_type == LAB && room_type != LABORATORY) ||
-                (lescycle_type == PRACTICE && room_type != PRACTICAL) ||
-                (lescycle_type == LECTURE && (room_type != BIG_LECTURE || 
-                    room_type != MEDIUM_LECTURE || room_type != SMALL_LECTURE))
-               )
-                return 1;
+                if ((lescycle_type == LAB && room_type != LABORATORY) ||
+                    (lescycle_type == PRACTICE && room_type != PRACTICAL) ||
+                    (lescycle_type == LECTURE && (room_type != BIG_LECTURE || 
+                        room_type != MEDIUM_LECTURE || room_type != SMALL_LECTURE))
+                   )
+                    return 1;
 
-        } else { return 2; }
+            } else { return 2; }
+        }
     }
 
     return 0;

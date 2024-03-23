@@ -22,3 +22,5 @@ struct room* rooms_generate(int rooom_qty, int building_num, int room_in_floor,
 
     return rooms;
 }
+
+
